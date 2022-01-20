@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# dependencies - webtorrent, mpv, xmllint
+
+mkdir -p $HOME/.cache/subsplease     # make a new folder for temporary
+
+menu="dmenu -i -l 25 -b"
+baseurl="https://subsplease.org/rss/"
+cachedir="$HOME/.cache/subsplease"
+
+# get rss file from subsplease
+curl -s $baseurl > $cachedir/rss.xml
+xmllint --xpath "//item" $cachedir/rss.xml > $cachedir/tmp.xml    # format rss.xml to make look pretty
+
+# get titles
+grep -o '<title>.*</title>' $cachedir/tmp.xml | 
+  awk '{$1=""}1' |
+  awk '$1=$1' |
+  sed 's/<[^>]*>//g' > $cachedir/titles.bw
+
+# selecting name of the anime
+paste -d\  $cachedir/titles.bw | 
+  $menu > $cachedir/anime
+
+# remove brackets
+code=$(grep -oP '\[.*?]' $cachedir/anime | head -n 2 | tail -1 | sed 's/[][]//g')
+
+# get magnet link with your selected anime
+grep -C 0 $code $cachedir/tmp.xml > $cachedir/match
+magnet=$(grep -Po "magnet:\?xt=urn:btih:[a-zA-Z0-9]*" $cachedir/match)
+
+# simple notification
+notify-send "Enjoy Watching" -i "NONE"
+
+# playing a video
+webtorrent --mpv "$magnet"
