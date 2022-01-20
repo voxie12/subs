@@ -1,6 +1,7 @@
 <h1 align="center">SUBS</h1>
 <p align="center">f@#k crunchyroll, use subs a tool which search magnet links and stream it with webtorrent</p>
 
+> Watch my video on this - [voxie12's notflix](https://youtu.be/6pUN9HQrMt8)
 
 ### How does this work?
 
